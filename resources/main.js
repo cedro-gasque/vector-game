@@ -53,7 +53,7 @@ var Game = {
 		var date = +new Date();
 		this.context.save();
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-		this.context.translate(-this.transX, -this.transY);
+		this.context.translate(this.transX, this.transY);
 		this.drawBackground();
 		player.update(this);
 		player.draw(this);
@@ -110,6 +110,13 @@ var Game = {
 				this.jumped = false;
 			}
 			this.lastPos = [this.x, this.y];
+            if (this.xV > 1 && this.x + gameengine.transX > canvas.width*9/10 && gameengine.transX < gameengine.levels[gameengine.world][gameengine.level].lims.x[1]-gameengine.canvas.width) {
+                gameengine.transX -= this.xV*2/gameengine.fps;
+                if (gameengine.transX > gameengine.levels[gameengine.world][gameengine.level].lims.x[1]-gameengine.canvas.width) gameengine.transX = gameengine.levels[gameengine.world][gameengine.level].lims.x[1]-gameengine.canvas.width;
+            } else if (this.xV < -1 && this.x + gameengine.transX < canvas.width/10 && gameengine.transX > gameengine.levels[gameengine.world][gameengine.level].lims.x[0]) {
+                gameengine.transX -= this.xV*2/gameengine.fps;
+                if (gameengine.transX < gameengine.levels[gameengine.world][gameengine.level].lims.x[0]) gameengine.transX = gameengine.levels[gameengine.world][gameengine.level].lims.x[0];
+            }
 			this.x+=this.xV*2/gameengine.fps;
 			gameengine.levels[gameengine.world][gameengine.level].badpath.bind(gameengine)(this);
 			gameengine.levels[gameengine.world][gameengine.level].normalpath.bind(gameengine)(this);
@@ -240,12 +247,11 @@ var Game = {
 var keylist = [undefined, undefined, undefined, 'BREAK', undefined, undefined, undefined, undefined, 'BACKSPACE', 'TAB', undefined, undefined, undefined, 'ENTER', undefined, undefined, 'SHIFT', 'CTRL', 'ALT', 'PAUSE', 'CAPS', undefined, undefined, undefined, undefined, undefined, undefined, 'ESCAPE', undefined, undefined, undefined, undefined, 'SPACE', 'PAGEUP', 'PAGEDOWN', 'END', 'HOME', 'LEFT', 'UP', 'RIGHT', 'DOWN', undefined, undefined, undefined, undefined, 'INSERT', 'DELETE', undefined, 'ZERO', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'LEFTWIN', 'RIGHTWIN', 'SELECT', undefined, undefined, 'NUM0', 'NUM1', 'NUM2', 'NUM3', 'NUM4', 'NUM5', 'NUM6', 'NUM7', 'NUM8', 'NUM9', 'MULT', 'ADD', undefined, 'SUB', 'DECIMAL', 'DIVIDE', '1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'NUMLOCK', 'SCRLOCK', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'COLON', 'EQUALS', 'COMMA', 'DASH', 'PERIOD', 'FORSLASH', 'GRAVE', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'OPENBRAC', 'BACKSLASH', 'CLOSEBRAC', 'QUOTE'];
 document.body.onload = Game.setup.bind(Game);
 document.addEventListener('keydown',function (e) {
-	key[keylist[e.keyCode]] = true;
+	if (keylist[e.keyCode]) key[keylist[e.keyCode]] = true;
 	if (Game.paused && key.ESCAPE) {
 		key.ESCAPE = false;
 		Game.pause();
 	}
-	console.log(keylist[e.keyCode]+': '+e.keyCode);
 }, false);
 document.addEventListener('keyup',function (e) {
 	key[keylist[e.keyCode]] = false;
